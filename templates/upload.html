@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Files | FedEx</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-purple: #4D148C;
+            --secondary-orange: #FF6600;
+            --dark-purple: #3B0F6A;
+            --light-overlay: rgba(255, 255, 255, 0.15);
+            --input-bg: rgba(255, 255, 255, 0.9);
+            --input-border: #FF6600;
+            --button-hover: #E65500;
+            --error-color: #FF3333;
+            --success-color: #33CC33;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, var(--primary-purple), var(--secondary-orange));
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 2.8em;
+            margin-bottom: 1.5em;
+            text-align: center;
+            text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        form {
+            background: var(--light-overlay);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        input[type="file"],
+        input[type="number"] {
+            padding: 10px;
+            border: 1px solid var(--input-border);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: #333;
+            height: 40px;
+            font-size: 1em;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-upload {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            border: 2px dashed var(--input-border);
+            border-radius: 8px;
+            padding: 10px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .file-upload:hover {
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .file-upload.dragover {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: var(--secondary-orange);
+        }
+
+        .file-upload span {
+            flex: 1;
+            color: #333;
+        }
+
+        .file-upload button {
+            background: var(--secondary-orange);
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            height: 40px;
+        }
+
+        .file-upload button:hover {
+            background: var(--button-hover);
+        }
+
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        button[type="submit"] {
+            padding: 12px;
+            background-color: var(--primary-purple);
+            border: none;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        button[type="submit"]:hover {
+            background-color: var(--dark-purple);
+            transform: scale(1.05);
+        }
+
+        .message {
+            margin-top: 10px;
+            font-size: 0.9em;
+            text-align: center;
+        }
+
+        .message.error {
+            color: var(--error-color);
+        }
+
+        .message.success {
+            color: var(--success-color);
+        }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 2.2em;
+            }
+
+            form {
+                padding: 20px;
+            }
+
+            button[type="submit"] {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Upload Files</h1>
+    <form action="{{ url_for('upload_file') }}" method="post" enctype="multipart/form-data" id="uploadForm" novalidate>
+        <div class="form-group">
+            <label for="uld_file">ULD File:</label>
+            <label for="uld_file" class="file-upload" id="uldUpload">
+                <span id="uldFileName">Choose ULD File...</span>
+                <button type="button">Browse</button>
+            </label>
+            <input type="file" id="uld_file" name="uld_file" accept=".csv,.txt" aria-describedby="uldHelp" required>
+            <div id="uldHelp" class="message" aria-live="polite"></div>
+        </div>
+        <div class="form-group">
+            <label for="boxes_file">Boxes File:</label>
+            <label for="boxes_file" class="file-upload" id="boxesUpload">
+                <span id="boxesFileName">Choose Boxes File...</span>
+                <button type="button">Browse</button>
+            </label>
+            <input type="file" id="boxes_file" name="boxes_file" accept=".csv,.txt" aria-describedby="boxesHelp" required>
+            <div id="boxesHelp" class="message" aria-live="polite"></div>
+        </div>
+        <div class="form-group">
+            <label for="k">Value of k (where k ≥ 1):</label>
+            <input type="number" id="k" name="k" min="1" aria-describedby="kHelp" required>
+            <div id="kHelp" class="message" aria-live="polite"></div>
+        </div>
+        <button type="submit">Upload</button>
+    </form>
+
+    <script>
+        // Handle custom file upload UI
+        document.querySelectorAll('.file-upload').forEach(upload => {
+            const fileInput = document.getElementById(upload.getAttribute('for'));
+            const fileNameSpan = upload.querySelector('span');
+
+            upload.addEventListener('click', () => {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length > 0) {
+                    fileNameSpan.textContent = fileInput.files[0].name;
+                    showMessage(fileInput, 'File selected successfully.', 'success');
+                } else {
+                    fileNameSpan.textContent = 'Choose File...';
+                }
+            });
+
+            // Drag and Drop
+            upload.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                upload.classList.add('dragover');
+            });
+
+            upload.addEventListener('dragleave', () => {
+                upload.classList.remove('dragover');
+            });
+
+            upload.addEventListener('drop', (e) => {
+                e.preventDefault();
+                upload.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    fileInput.files = e.dataTransfer.files;
+                    fileNameSpan.textContent = fileInput.files[0].name;
+                    showMessage(fileInput, 'File selected successfully.', 'success');
+                }
+            });
+        });
+
+        // Form validation
+        const form = document.getElementById('uploadForm');
+
+        form.addEventListener('submit', (e) => {
+            let valid = true;
+
+            // Validate k
+            const kInput = document.getElementById('k');
+            const kHelp = document.getElementById('kHelp');
+            if (kInput.value < 1) {
+                showMessage(kInput, 'Value of k must be at least 1.', 'error');
+                valid = false;
+            } else {
+                showMessage(kInput, 'Looks good!', 'success');
+            }
+
+            // Validate file inputs
+            ['uld_file', 'boxes_file'].forEach(id => {
+                const input = document.getElementById(id);
+                const help = document.getElementById(id === 'uld_file' ? 'uldHelp' : 'boxesHelp');
+                if (input.files.length === 0) {
+                    showMessage(input, 'This field is required.', 'error');
+                    valid = false;
+                }
+            });
+
+            if (!valid) {
+                e.preventDefault();
+            }
+        });
+
+        function showMessage(element, message, type) {
+            const help = document.getElementById(element.id + 'Help');
+            help.textContent = message;
+            help.className = 'message ' + type;
+        }
+    </script>
+</body>
+</html>
