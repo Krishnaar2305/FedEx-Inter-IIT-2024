@@ -16,13 +16,13 @@ This project provides a Python implementation for optimizing 3D bin packing. The
 
 ---
 
-## Input and Output Formats
+### Input and Output Formats
 
 ### Input Files
 
 The input files must include:
 
-- **Bin Details File**:  
+- **Bin Details File**:
   ```plaintext
   U<ID>,<length>,<width>,<height>,<weight>
   ```  
